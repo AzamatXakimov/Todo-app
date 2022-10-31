@@ -7,16 +7,16 @@ const elAllTodo = document.querySelector(".js-all-number");
 const elUncomplateTodo = document.querySelector(".js-uncomplate-number");
 const elComplateTodo = document.querySelector(".js-complate-number");
 
-const arr = [];
+const localTodos = JSON.parse(window.localStorage.getItem("todos"))
+const arr = localTodos || [];
 
 function AddArray(){
     elList.innerHTML = null;
-    const checknumber = {
-        all: 0,
-        uncomplate: 0,
-        complate: 0,
-    };
-    
+
+    const complate = arr.filter(item => item.isComplate)
+    const uncomplate = arr.filter(item => !item.isComplate)
+    const All = arr.length
+
     for (let i = 0; i < arr.length; i++) {
         arr[i].id = i;
         const elItem = document.createElement("li");
@@ -41,11 +41,9 @@ function AddArray(){
         if(arr[i].isComplate){
             elText.style.textDecoration = "line-through";
             elCheckBox.setAttribute("checked", "");
-            checknumber.complate++;
         }
         else{
             elCheckBox.removeAttribute("checked");
-            checknumber.uncomplate++;
         }
 
         elDelate.classList.add("delate-btn", "btn", "btn-danger", "me-3");
@@ -65,12 +63,11 @@ function AddArray(){
         elItem.appendChild(elBtnBox);
 
         elList.appendChild(elItem);
-        checknumber.all++;
     }
 
-    elAllTodo.textContent = checknumber.all;
-    elUncomplateTodo.textContent = checknumber.uncomplate;
-    elComplateTodo.textContent = checknumber.complate;
+    elAllTodo.textContent = All;
+    elUncomplateTodo.textContent = uncomplate.length;
+    elComplateTodo.textContent = complate.length;
 };
 
 const FormTypes = {
@@ -96,6 +93,7 @@ elForm.addEventListener("submit", function(evt){
         arr.push(obj);
         elForm.reset();
         AddArray()
+        window.localStorage.setItem("todos", JSON.stringify(arr))
         // console.log(obj.id);
     }
     else if(formType === FormTypes.edit){
@@ -114,6 +112,7 @@ elForm.addEventListener("submit", function(evt){
         AddArray();
         formType = FormTypes.add;
         elFormBtn.textContent = "Add";
+        window.localStorage.setItem("todos", JSON.stringify(arr))
     }
 });
 
@@ -122,6 +121,7 @@ elList.addEventListener("click", function(evt){
         const delateBtnId = Number(evt.target.dataset.id);
         arr.splice(delateBtnId, 1);
         AddArray()
+        window.localStorage.setItem("todos", JSON.stringify(arr))
     }
     else if(evt.target.matches(".edit-btn")){
         const EdnitBtnId = Number(evt.target.dataset.id);
@@ -149,5 +149,8 @@ elList.addEventListener("click", function(evt){
             checked.isComplate = false;
         }
         AddArray()
+        window.localStorage.setItem("todos", JSON.stringify(arr))
     }
 });
+
+AddArray()
